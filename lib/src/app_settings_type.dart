@@ -28,6 +28,14 @@ enum AppSettingsType {
   /// Only supported on Android.
   batteryOptimization,
 
+  /// Open the biometric enrollment settings.
+  ///
+  /// On Android this targets the biometric enroll screen (or the closest
+  /// available security screen on older API levels). On iOS there is no public
+  /// API to reach biometric enrollment, so the app's own settings page is
+  /// opened as a best effort.
+  biometricEnroll,
+
   /// Open the Bluetooth settings.
   ///
   /// Only supported on Android.

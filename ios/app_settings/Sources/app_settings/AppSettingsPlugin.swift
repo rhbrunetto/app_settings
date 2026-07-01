@@ -54,6 +54,12 @@ public class AppSettingsPlugin: NSObject, @preconcurrency FlutterPlugin, UIWindo
                 result(nil)
             }
             break
+        case "biometricEnroll":
+            // iOS exposes no public URL for Face ID / Touch ID / Passcode
+            // enrollment, so open the app's own settings page as a best effort.
+            openSettings(settingsUrl: UIApplication.openSettingsURLString)
+            result(nil)
+            break
         default:
             // Show the default settings as fallback.
             openSettings(settingsUrl: UIApplication.openSettingsURLString)

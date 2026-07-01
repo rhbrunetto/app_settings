@@ -3,6 +3,7 @@ package com.spencerccf.app_settings
 import android.app.Activity
 import android.app.admin.DevicePolicyManager
 import android.content.Intent
+import android.hardware.biometrics.BiometricManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -72,6 +73,7 @@ class AppSettingsPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       "apn" -> openSettings(Settings.ACTION_APN_SETTINGS, result, asAnotherTask)
       "appLocale" -> openAppLocaleSettings(result, asAnotherTask)
       "batteryOptimization" -> openBatteryOptimizationSettings(result, asAnotherTask)
+      "biometricEnroll" -> openBiometricEnrollSettings(result, asAnotherTask)
       "bluetooth" -> openSettings(Settings.ACTION_BLUETOOTH_SETTINGS, result, asAnotherTask)
       "dataRoaming" -> openSettings(Settings.ACTION_DATA_ROAMING_SETTINGS, result, asAnotherTask)
       "date" -> openSettings(Settings.ACTION_DATE_SETTINGS, result, asAnotherTask)
@@ -286,6 +288,27 @@ class AppSettingsPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     } catch (e: Exception) {
       // If the Activity fails to start, show the app settings instead.
       openAppSettings(result, asAnotherTask)
+    }
+  }
+
+  /**
+   * Open the biometric enrollment settings.
+   *
+   * Uses ACTION_BIOMETRIC_ENROLL on API 30+, ACTION_FINGERPRINT_ENROLL on
+   * API 28-29, and falls back to the security settings on older devices.
+   */
+  private fun openBiometricEnrollSettings(result: Result, asAnotherTask: Boolean) {
+    when {
+      Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+        val intent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).putExtra(
+          Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
+          BiometricManager.Authenticators.BIOMETRIC_STRONG,
+        )
+        openSettingsWithIntent(intent, result, asAnotherTask)
+      }
+      Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ->
+        openSettings(Settings.ACTION_FINGERPRINT_ENROLL, result, asAnotherTask)
+      else -> openSettings(Settings.ACTION_SECURITY_SETTINGS, result, asAnotherTask)
     }
   }
 
